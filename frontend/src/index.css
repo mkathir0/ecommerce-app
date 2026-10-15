@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #ffffff;
+  color: #111827;
+}
+
+/* Custom range slider styling */
+input[type="range"] {
+  accent-color: #000000;
+}
+
+/* Custom checkbox styling */
+input[type="checkbox"] {
+  accent-color: #000000;
+}

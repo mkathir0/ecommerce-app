@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MeShop &bull; Profile</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Navigation Header -->
+  <nav class="navbar">
+    <a href="index.html" class="nav-brand">MeShop<span>.</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="login.html">Login</a></li>
+      <li><a href="signup.html">Signup</a></li>
+      <li>
+        <a href="cart.html">
+          My Cart <span class="cart-badge" id="cart-badge-count">0</span>
+        </a>
+      </li>
+      <li><a href="profile.html" class="active">Profile</a></li>
+    </ul>
+  </nav>
+
+  <!-- Profile Content Area -->
+  <main class="profile-container">
+    <div class="profile-card">
+      <div class="profile-header">
+        <div>
+          <h1>My Profile</h1>
+          <p style="color: #6b7280; font-size: 0.9rem;">
+            Hello, <strong id="user-greeting" style="color: #111;">User</strong>! Manage your account details below.
+          </p>
+        </div>
+        <button type="button" id="btn-logout" class="btn-logout">
+          Logout
+        </button>
+      </div>
+
+      <!-- Alert Box for Profile Updates -->
+      <div id="profile-alert" class="alert-message"></div>
+
+      <!-- Edit Information Form -->
+      <form id="profile-form">
+        <div class="form-group">
+          <label for="profile-firstName">First Name</label>
+          <input 
+            type="text" 
+            id="profile-firstName" 
+            class="form-control" 
+            required 
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="profile-lastName">Last Name</label>
+          <input 
+            type="text" 
+            id="profile-lastName" 
+            class="form-control" 
+            required 
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="profile-email">Email (Immutable)</label>
+          <input 
+            type="email" 
+            id="profile-email" 
+            class="form-control" 
+            readonly 
+            disabled 
+            style="background-color: var(--color-gray-100); color: var(--color-gray-500); cursor: not-allowed;" 
+          />
+        </div>
+
+        <!-- Password Change Section -->
+        <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--color-gray-200);">
+          <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 1rem;">Change Password (Optional)</h3>
+          
+          <div class="form-group">
+            <label for="profile-oldPassword">Current Password</label>
+            <input 
+              type="password" 
+              id="profile-oldPassword" 
+              class="form-control" 
+              placeholder="Enter current password" 
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="profile-newPassword">New Password</label>
+            <input 
+              type="password" 
+              id="profile-newPassword" 
+              class="form-control" 
+              placeholder="Enter new password" 
+            />
+          </div>
+        </div>
+
+        <div style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+          <div style="font-size: 0.75rem; color: #9ca3af;">
+            Session Token: <code id="user-token" style="background: #f3f4f6; padding: 2px 6px; border-radius: 4px;"></code>
+          </div>
+          <button type="submit" id="btn-save-profile" class="btn-black">
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2026 MeShop. All rights reserved.</p>
+  </footer>
+
+  <script src="script.js"></script>
+  <script src="profile.js"></script>
+</body>
+</html>

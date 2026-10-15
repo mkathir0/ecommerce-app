@@ -1,0 +1,15 @@
+{
+  "name": "nexus-tech-ecommerce",
+  "version": "1.0.0",
+  "description": "Full-stack modern tech & gadgets e-commerce product",
+  "main": "backend/server.js",
+  "scripts": {
+    "server": "npm run dev --prefix backend",
+    "client": "npm run dev --prefix frontend",
+    "dev": "npm run server",
+    "start": "node backend/server.js"
+  },
+  "keywords": ["ecommerce", "mern", "tech", "stripe", "react"],
+  "author": "",
+  "license": "ISC"
+}

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MeShop &bull; Shop</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Navigation Header -->
+  <nav class="navbar">
+    <a href="index.html" class="nav-brand">MeShop<span>.</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="login.html">Login</a></li>
+      <li><a href="signup.html">Signup</a></li>
+      <li>
+        <a href="cart.html">
+          My Cart <span class="cart-badge" id="cart-badge-count">0</span>
+        </a>
+      </li>
+      <li><a href="profile.html">Profile</a></li>
+    </ul>
+  </nav>
+
+  <!-- Shop Container: Sidebar on Left + Main Content on Right -->
+  <div class="shop-container">
+    <!-- Fixed Sidebar on Left with Checkboxes & Slider -->
+    <aside class="sidebar">
+      <!-- 1. Color Filters -->
+      <div class="filter-section">
+        <h3 class="filter-title">Colors</h3>
+        <div class="filter-list">
+          <label class="filter-label">
+            <input type="checkbox" name="color-filter" value="Red" />
+            <span>Red</span>
+          </label>
+          <label class="filter-label">
+            <input type="checkbox" name="color-filter" value="Blue" />
+            <span>Blue</span>
+          </label>
+          <label class="filter-label">
+            <input type="checkbox" name="color-filter" value="Green" />
+            <span>Green</span>
+          </label>
+          <label class="filter-label">
+            <input type="checkbox" name="color-filter" value="Black" />
+            <span>Black</span>
+          </label>
+          <label class="filter-label">
+            <input type="checkbox" name="color-filter" value="White" />
+            <span>White</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- 2. Size Filters -->
+      <div class="filter-section">
+        <h3 class="filter-title">Sizes</h3>
+        <div class="filter-list">
+          <label class="filter-label">
+            <input type="checkbox" name="size-filter" value="S" />
+            <span>S</span>
+          </label>
+          <label class="filter-label">
+            <input type="checkbox" name="size-filter" value="M" />
+            <span>M</span>
+          </label>
+          <label class="filter-label">
+            <input type="checkbox" name="size-filter" value="L" />
+            <span>L</span>
+          </label>
+          <label class="filter-label">
+            <input type="checkbox" name="size-filter" value="XL" />
+            <span>XL</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- 3. Rating Filters -->
+      <div class="filter-section">
+        <h3 class="filter-title">Rating</h3>
+        <div class="filter-list">
+          <label class="filter-label">
+            <input type="checkbox" name="rating-filter" value="4" />
+            <span>4 Stars & Above</span>
+          </label>
+          <label class="filter-label">
+            <input type="checkbox" name="rating-filter" value="3" />
+            <span>3 Stars & Above</span>
+          </label>
+          <label class="filter-label">
+            <input type="checkbox" name="rating-filter" value="2" />
+            <span>2 Stars & Above</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- 4. Price Slider (input type="range") -->
+      <div class="filter-section">
+        <h3 class="filter-title">Price Range</h3>
+        <div class="range-slider-container">
+          <input 
+            type="range" 
+            id="price-slider" 
+            min="0" 
+            max="1000" 
+            value="1000" 
+            step="10" 
+          />
+          <div class="range-values">
+            <span>$0</span>
+            <span id="price-value" style="color: var(--color-black); font-weight: 700;">$1000</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="shop-main">
+      <!-- 1. Main Search Input Field -->
+      <div class="search-wrapper">
+        <input 
+          type="text" 
+          id="search-input" 
+          class="search-input" 
+          placeholder="Search products by title or description..." 
+        />
+      </div>
+
+      <!-- 2. Five Toggle Buttons Under Search Field (All, Men's, Women's, Jewellery, Electronics) -->
+      <div class="category-toggles">
+        <button type="button" class="toggle-btn active" data-category="all">
+          All
+        </button>
+        <button type="button" class="toggle-btn" data-category="men's">
+          Men's
+        </button>
+        <button type="button" class="toggle-btn" data-category="women's">
+          Women's
+        </button>
+        <button type="button" class="toggle-btn" data-category="jewellery">
+          Jewellery
+        </button>
+        <button type="button" class="toggle-btn" data-category="electronics">
+          Electronics
+        </button>
+      </div>
+
+      <!-- 3. Products Container (mapped and flexed/gridded) -->
+      <section id="products-container" class="products-grid">
+        <!-- Products injected dynamically by shop.js -->
+      </section>
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2026 MeShop. All rights reserved.</p>
+  </footer>
+
+  <script src="script.js"></script>
+  <script src="shop.js"></script>
+</body>
+</html>
