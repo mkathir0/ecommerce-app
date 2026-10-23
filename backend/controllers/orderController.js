@@ -29,25 +29,34 @@ const createOrder = async (req, res, next) => {
     const order = new Order({
       user: req.user ? req.user._id : null,
       customerEmail: customerEmail || (req.user ? req.user.email : 'guest@example.com'),
-      customerName: customerName || (req.user ? req.user.name : shippingAddress.recipientName),
+      customerName: customerName || (req.user ? req.user.name : shippingAddress.recipientName || 'Customer'),
       orderItems,
-      shippingAddress,
+      shippingAddress: {
+        recipientName: shippingAddress.recipientName || (req.user ? req.user.name : 'Customer'),
+        street: shippingAddress.street,
+        city: shippingAddress.city,
+        state: shippingAddress.state || 'CA',
+        postalCode: shippingAddress.postalCode || '94103',
+        country: shippingAddress.country || 'USA',
+        phone: shippingAddress.phone || (req.user ? req.user.phone : '+1 (555) 0100') || '+1 (555) 0100',
+      },
       deliveryOption: deliveryOption || { name: 'Express Tech Delivery', estimatedDays: '2-3 Business Days', price: shippingPrice || 0 },
-      paymentMethod: paymentMethod || 'Stripe Checkout',
+      paymentMethod: paymentMethod || 'Online Checkout',
       itemsPrice,
-      taxPrice,
-      shippingPrice,
+      taxPrice: taxPrice || 0,
+      shippingPrice: shippingPrice || 0,
       discountAmount: discountAmount || 0,
       totalPrice,
-      isPaid: false,
-      status: 'Processing',
+      isPaid: true,
+      paidAt: new Date(),
+      status: 'Confirmed',
       timeline: [
         {
           status: 'Order Placed',
           timestamp: new Date(),
-          note: 'Your order was received and queued for processing.'
-        }
-      ]
+          note: 'Your order was received and payment confirmed.',
+        },
+      ],
     });
 
     const createdOrder = await order.save();

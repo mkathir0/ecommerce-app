@@ -2,8 +2,7 @@ const mongoose = require('mongoose');
 
 const orderItemSchema = new mongoose.Schema({
   product: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Product',
+    type: mongoose.Schema.Types.Mixed,
     required: true,
   },
   title: { type: String, required: true },
@@ -27,21 +26,23 @@ const orderSchema = new mongoose.Schema(
     },
     customerEmail: {
       type: String,
-      required: true,
+      required: false,
+      default: 'customer@meshop.com',
     },
     customerName: {
       type: String,
-      required: true,
+      required: false,
+      default: 'Customer',
     },
     orderItems: [orderItemSchema],
     shippingAddress: {
-      recipientName: { type: String, required: true },
+      recipientName: { type: String, default: 'Customer' },
       street: { type: String, required: true },
       city: { type: String, required: true },
-      state: { type: String, required: true },
-      postalCode: { type: String, required: true },
-      country: { type: String, required: true, default: 'USA' },
-      phone: { type: String, required: true },
+      state: { type: String, default: '' },
+      postalCode: { type: String, default: '' },
+      country: { type: String, default: 'USA' },
+      phone: { type: String, default: '+1 555-0100' },
     },
     deliveryOption: {
       name: { type: String, default: 'Express Tech Delivery' },

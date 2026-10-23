@@ -4,12 +4,22 @@
   "description": "Full-stack modern tech & gadgets e-commerce product",
   "main": "backend/server.js",
   "scripts": {
+    "dev": "concurrently -n \"SERVER,CLIENT\" -c \"cyan,magenta\" \"npm run server\" \"npm run client\"",
     "server": "npm run dev --prefix backend",
     "client": "npm run dev --prefix frontend",
-    "dev": "npm run server",
+    "build": "npm run build --prefix frontend",
     "start": "node backend/server.js"
   },
-  "keywords": ["ecommerce", "mern", "tech", "stripe", "react"],
+  "keywords": [
+    "ecommerce",
+    "mern",
+    "tech",
+    "react",
+    "oauth"
+  ],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
 }

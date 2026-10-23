@@ -15,9 +15,12 @@ async function startDb() {
         fs.mkdirSync(dbPath, { recursive: true });
       }
 
-      const lockFile = path.join(dbPath, 'mongod.lock');
-      if (fs.existsSync(lockFile)) {
-        try { fs.unlinkSync(lockFile); } catch (e) {}
+      const lockFiles = ['mongod.lock', 'WiredTiger.lock'];
+      for (const file of lockFiles) {
+        const fullPath = path.join(dbPath, file);
+        if (fs.existsSync(fullPath)) {
+          try { fs.unlinkSync(fullPath); } catch (e) {}
+        }
       }
 
       console.log(`Starting local standalone database engine at: ${dbPath}...`);

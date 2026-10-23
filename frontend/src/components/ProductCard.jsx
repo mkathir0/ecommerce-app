@@ -63,9 +63,13 @@ export default function ProductCard({ product, onQuickView }) {
         onClick={() => onQuickView(product)}
       >
         <img
-          src={product.thumbnail}
+          src={product.image || product.thumbnail || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=400&q=80'}
           alt={product.title}
           loading="lazy"
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=400&q=80';
+          }}
           style={{
             position: 'absolute',
             top: 0,

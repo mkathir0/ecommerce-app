@@ -2,8 +2,12 @@ import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+import { WishlistProvider } from './context/WishlistContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import Toast from './components/Toast';
+import CartDrawer from './components/CartDrawer';
+import WishlistDrawer from './components/WishlistDrawer';
 import HomePage from './pages/HomePage';
 import ShopPage from './pages/ShopPage';
 import SignupPage from './pages/SignupPage';
@@ -28,10 +32,20 @@ export default function App() {
   return (
     <AuthProvider>
       <CartProvider>
-        <BrowserRouter>
-          <div className="flex flex-col min-h-screen bg-white text-gray-900 font-inter">
-            {/* Navigation Header */}
-            <Navbar />
+        <WishlistProvider>
+          <BrowserRouter>
+            <div className="flex flex-col min-h-screen bg-white text-gray-900 font-inter">
+              {/* Global Toast Notification Container */}
+              <Toast />
+
+              {/* Slide-over Mini-Cart Drawer */}
+              <CartDrawer />
+
+              {/* Slide-over Saved Items / Wishlist Drawer */}
+              <WishlistDrawer />
+
+              {/* Navigation Header */}
+              <Navbar />
 
             {/* Application Routes - Clean modern SPA paths */}
             <Routes>
@@ -57,6 +71,7 @@ export default function App() {
             <Footer />
           </div>
         </BrowserRouter>
+        </WishlistProvider>
       </CartProvider>
     </AuthProvider>
   );

@@ -28,6 +28,9 @@ const registerUser = async (req, res, next) => {
       password,
       phone: phone || '',
       role: role === 'admin' ? 'admin' : 'customer',
+      avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}`,
+      oauthProvider: 'local',
+      isEmailVerified: false,
     });
 
     res.status(201).json({
@@ -38,6 +41,9 @@ const registerUser = async (req, res, next) => {
         email: user.email,
         role: user.role,
         phone: user.phone,
+        avatar: user.avatar,
+        oauthProvider: user.oauthProvider,
+        isEmailVerified: user.isEmailVerified,
         address: user.address,
         token: generateToken(user._id),
       },
@@ -68,6 +74,9 @@ const loginUser = async (req, res, next) => {
           email: user.email,
           role: user.role,
           phone: user.phone,
+          avatar: user.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.name)}`,
+          oauthProvider: user.oauthProvider,
+          isEmailVerified: user.isEmailVerified,
           address: user.address,
           token: generateToken(user._id),
         },
@@ -75,6 +84,65 @@ const loginUser = async (req, res, next) => {
     } else {
       res.status(401).json({ success: false, message: 'Invalid email or password' });
     }
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    OAuth authentication (Google, GitHub, etc.)
+// @route   POST /api/auth/oauth
+const oauthLogin = async (req, res, next) => {
+  try {
+    const { provider = 'google', email, name, avatar, oauthId } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ success: false, message: 'OAuth provider did not provide a valid email' });
+    }
+
+    const cleanEmail = email.toLowerCase().trim();
+    let user = await User.findOne({ email: cleanEmail });
+
+    if (user) {
+      // User exists: update oauth info and avatar if not set
+      if (!user.avatar && avatar) {
+        user.avatar = avatar;
+      }
+      if (!user.oauthProvider || user.oauthProvider === 'local') {
+        user.oauthProvider = provider;
+        user.oauthId = oauthId || user.oauthId;
+      }
+      user.isEmailVerified = true;
+      await user.save();
+    } else {
+      // Register new user via OAuth
+      const displayName = name || cleanEmail.split('@')[0];
+      user = await User.create({
+        name: displayName,
+        email: cleanEmail,
+        oauthProvider: provider,
+        oauthId: oauthId || '',
+        avatar: avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(displayName)}`,
+        isEmailVerified: true,
+        role: 'customer',
+      });
+    }
+
+    res.json({
+      success: true,
+      message: `Signed in successfully with ${provider}`,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        phone: user.phone,
+        avatar: user.avatar,
+        oauthProvider: user.oauthProvider,
+        isEmailVerified: user.isEmailVerified,
+        address: user.address,
+        token: generateToken(user._id),
+      },
+    });
   } catch (error) {
     next(error);
   }
@@ -105,14 +173,17 @@ const updateUserProfile = async (req, res, next) => {
 
     user.name = req.body.name || user.name;
     user.phone = req.body.phone !== undefined ? req.body.phone : user.phone;
+    if (req.body.avatar) {
+      user.avatar = req.body.avatar;
+    }
 
     if (req.body.address) {
       user.address = {
-        street: req.body.address.street || user.address.street,
-        city: req.body.address.city || user.address.city,
-        state: req.body.address.state || user.address.state,
-        postalCode: req.body.address.postalCode || user.address.postalCode,
-        country: req.body.address.country || user.address.country,
+        street: req.body.address.street !== undefined ? req.body.address.street : user.address.street,
+        city: req.body.address.city !== undefined ? req.body.address.city : user.address.city,
+        state: req.body.address.state !== undefined ? req.body.address.state : user.address.state,
+        postalCode: req.body.address.postalCode !== undefined ? req.body.address.postalCode : user.address.postalCode,
+        country: req.body.address.country !== undefined ? req.body.address.country : user.address.country,
       };
     }
 
@@ -129,6 +200,9 @@ const updateUserProfile = async (req, res, next) => {
         name: updatedUser.name,
         email: updatedUser.email,
         role: updatedUser.role,
+        avatar: updatedUser.avatar,
+        oauthProvider: updatedUser.oauthProvider,
+        isEmailVerified: updatedUser.isEmailVerified,
         phone: updatedUser.phone,
         address: updatedUser.address,
         token: generateToken(updatedUser._id),
@@ -142,6 +216,7 @@ const updateUserProfile = async (req, res, next) => {
 module.exports = {
   registerUser,
   loginUser,
+  oauthLogin,
   getUserProfile,
   updateUserProfile,
 };

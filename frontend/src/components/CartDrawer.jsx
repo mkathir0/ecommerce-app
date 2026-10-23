@@ -1,418 +1,191 @@
-import React, { useState } from 'react';
-import { X, Trash2, ArrowRight, ShieldCheck, Tag, ShoppingCart } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { X, Trash2, ShoppingBag, ArrowRight, ShieldCheck, Plus, Minus } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { formatPrice } from '../utils/currency';
 
-export default function CartDrawer({ onProceedToCheckout }) {
+export default function CartDrawer() {
   const {
-    cartItems,
-    isCartOpen,
-    setIsCartOpen,
-    currency,
+    cart,
+    cartCount,
     subtotal,
-    discountAmount,
-    discountRate,
-    taxPrice,
-    shippingPrice,
-    totalPrice,
-    isFreeShipping,
-    amountToFreeShipping,
-    freeShippingThreshold,
+    isCartDrawerOpen,
+    closeCartDrawer,
     updateQuantity,
     removeFromCart,
-    applyPromoCode,
-    promoCode
   } = useCart();
+  const navigate = useNavigate();
 
-  const [inputCode, setInputCode] = useState('');
+  // Escape key closes drawer
+  useEffect(() => {
+    if (!isCartDrawerOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') closeCartDrawer();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isCartDrawerOpen, closeCartDrawer]);
 
-  if (!isCartOpen) return null;
+  if (!isCartDrawerOpen) return null;
 
-  const freeShippingProgress = Math.min(100, (subtotal / freeShippingThreshold) * 100);
-
-  const handleApply = (e) => {
-    e.preventDefault();
-    if (inputCode) {
-      applyPromoCode(inputCode);
-      setInputCode('');
-    }
+  const handleCheckout = () => {
+    closeCartDrawer();
+    navigate('/cart');
   };
 
   return (
     <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(5, 7, 12, 0.75)',
-        backdropFilter: 'blur(10px)',
-        zIndex: 1000,
-        display: 'flex',
-        justifyContent: 'flex-end',
-      }}
-      onClick={() => setIsCartOpen(false)}
+      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex justify-end animate-backdrop"
+      onClick={closeCartDrawer}
     >
       <div
-        className="glass-panel"
-        style={{
-          width: '100%',
-          maxWidth: '460px',
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          boxShadow: 'var(--shadow-lg)',
-          animation: 'slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-          borderRadius: 0,
-          borderLeft: '1px solid var(--border-subtle)',
-          backgroundColor: '#0c0f1d',
-        }}
+        className="w-full max-w-md bg-white h-full shadow-2xl flex flex-col justify-between border-l border-gray-200 animate-drawer-right"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div
-          style={{
-            padding: '1.25rem 1.5rem',
-            borderBottom: '1px solid var(--border-subtle)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <ShoppingCart size={20} color="var(--accent-cyan)" />
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Your Cart</h2>
-            <span
-              style={{
-                background: 'rgba(0, 242, 254, 0.15)',
-                color: 'var(--accent-cyan)',
-                borderRadius: '9999px',
-                padding: '0.1rem 0.6rem',
-                fontSize: '0.75rem',
-                fontWeight: 700,
-              }}
-            >
-              {cartItems.length} items
+        <div className="p-5 border-b border-gray-200 flex items-center justify-between bg-gray-50/70">
+          <div className="flex items-center gap-2.5">
+            <ShoppingBag size={20} className="text-gray-900" />
+            <h2 className="text-lg font-black text-gray-900 tracking-tight">Your Bag</h2>
+            <span className="bg-black text-white text-[11px] font-bold px-2 py-0.5 rounded-full">
+              {cartCount}
             </span>
           </div>
 
           <button
-            onClick={() => setIsCartOpen(false)}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'var(--text-muted)',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-            }}
+            type="button"
+            onClick={closeCartDrawer}
+            className="w-8 h-8 rounded-full bg-white hover:bg-gray-200 text-gray-700 flex items-center justify-center transition border border-gray-200 shadow-sm"
+            aria-label="Close bag drawer"
           >
-            <X size={20} />
+            <X size={16} />
           </button>
         </div>
 
-        {/* Free Shipping Progress Bar */}
-        <div
-          style={{
-            padding: '0.85rem 1.5rem',
-            background: 'rgba(255, 255, 255, 0.02)',
-            borderBottom: '1px solid var(--border-subtle)',
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '0.4rem' }}>
-            {isFreeShipping ? (
-              <span style={{ color: '#34d399', fontWeight: 600 }}>🎉 You qualified for Free Express Shipping!</span>
-            ) : (
-              <span style={{ color: 'var(--text-secondary)' }}>
-                Add <strong style={{ color: 'var(--accent-cyan)' }}>{formatPrice(amountToFreeShipping, currency)}</strong> more for Free Shipping
-              </span>
-            )}
-            <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>{Math.round(freeShippingProgress)}%</span>
-          </div>
-          <div
-            style={{
-              width: '100%',
-              height: '6px',
-              backgroundColor: 'rgba(255, 255, 255, 0.08)',
-              borderRadius: '9999px',
-              overflow: 'hidden',
-            }}
-          >
-            <div
-              style={{
-                width: `${freeShippingProgress}%`,
-                height: '100%',
-                background: 'var(--gradient-brand)',
-                borderRadius: '9999px',
-                transition: 'width 0.4s ease',
-              }}
-            />
-          </div>
-        </div>
-
         {/* Cart Items List */}
-        <div
-          style={{
-            flex: 1,
-            overflowY: 'auto',
-            padding: '1.25rem 1.5rem',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1rem',
-          }}
-        >
-          {cartItems.length === 0 ? (
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                height: '100%',
-                color: 'var(--text-muted)',
-                gap: '1rem',
-                textAlign: 'center',
-              }}
-            >
-              <div
-                style={{
-                  width: '64px',
-                  height: '64px',
-                  borderRadius: '50%',
-                  background: 'rgba(255, 255, 255, 0.04)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <ShoppingCart size={28} color="var(--text-muted)" />
+        <div className="flex-1 overflow-y-auto p-5 space-y-4 divide-y divide-gray-100">
+          {cart.length === 0 ? (
+            <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-4">
+              <div className="w-16 h-16 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center">
+                <ShoppingBag size={28} />
               </div>
               <div>
-                <p style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>
-                  Your cart is currently empty
+                <h3 className="text-base font-bold text-gray-900">Your bag is empty</h3>
+                <p className="text-xs text-gray-500 mt-1 max-w-xs">
+                  Discover our curated collections across apparel, jewellery, tech, and footwear.
                 </p>
-                <p style={{ fontSize: '0.85rem' }}>Discover top-tier hardware and add gear to begin.</p>
               </div>
               <button
-                onClick={() => setIsCartOpen(false)}
-                className="btn-outline-glow"
-                style={{ fontSize: '0.85rem' }}
+                type="button"
+                onClick={() => {
+                  closeCartDrawer();
+                  navigate('/shop');
+                }}
+                className="bg-black hover:bg-neutral-800 text-white font-bold px-6 py-2.5 rounded-xl text-xs shadow-sm transition"
               >
-                Explore Gear
+                Start Shopping
               </button>
             </div>
           ) : (
-            cartItems.map((item) => {
-              const discounted = item.product.discountPercentage
-                ? item.product.price * (1 - item.product.discountPercentage / 100)
-                : item.product.price;
-
-              return (
-                <div
-                  key={item.product._id}
-                  style={{
-                    display: 'flex',
-                    gap: '1rem',
-                    padding: '0.85rem',
-                    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                    borderRadius: '12px',
-                    border: '1px solid var(--border-subtle)',
-                  }}
-                >
+            cart.map((item) => (
+              <div key={item.id} className="pt-4 first:pt-0 flex gap-4 items-start">
+                {/* Item Image */}
+                <div className="w-20 h-20 rounded-xl bg-gray-50 border border-gray-100 p-2 flex items-center justify-center shrink-0 overflow-hidden">
                   <img
-                    src={item.product.thumbnail}
-                    alt={item.product.title}
-                    style={{
-                      width: '70px',
-                      height: '70px',
-                      objectFit: 'cover',
-                      borderRadius: '8px',
-                      backgroundColor: '#000',
+                    src={item.image || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=150&q=80'}
+                    alt={item.title}
+                    className="w-full h-full object-contain"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=150&q=80';
                     }}
                   />
+                </div>
 
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                      <h4
-                        style={{
-                          fontSize: '0.88rem',
-                          fontWeight: 600,
-                          lineHeight: 1.3,
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden',
-                          marginRight: '8px',
-                        }}
-                      >
-                        {item.product.title}
-                      </h4>
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <h4 className="text-xs sm:text-sm font-bold text-gray-900 truncate" title={item.title}>
+                      {item.title}
+                    </h4>
+                    <button
+                      type="button"
+                      onClick={() => removeFromCart(item.id)}
+                      className="text-gray-400 hover:text-red-500 transition shrink-0 p-1"
+                      title="Remove item"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+
+                  {(item.selectedColor || item.selectedSize) && (
+                    <div className="flex items-center gap-2 text-[11px] text-gray-500 mt-0.5">
+                      {item.selectedColor && (
+                        <span className="capitalize">Color: {item.selectedColor}</span>
+                      )}
+                      {item.selectedSize && (
+                        <span className="uppercase">Size: {item.selectedSize}</span>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between mt-3">
+                    {/* Stepper */}
+                    <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white text-xs">
                       <button
-                        onClick={() => removeFromCart(item.product._id)}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          color: '#fb7185',
-                          cursor: 'pointer',
-                          padding: '2px',
-                        }}
+                        type="button"
+                        onClick={() => updateQuantity(item.id, (item.quantity || 1) - 1)}
+                        className="w-6 h-6 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition"
                       >
-                        <Trash2 size={15} />
+                        <Minus size={11} />
+                      </button>
+                      <span className="w-7 text-center font-bold text-gray-900">
+                        {item.quantity || 1}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => updateQuantity(item.id, (item.quantity || 1) + 1)}
+                        className="w-6 h-6 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition"
+                      >
+                        <Plus size={11} />
                       </button>
                     </div>
 
-                    <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          background: 'rgba(255, 255, 255, 0.06)',
-                          borderRadius: '6px',
-                          border: '1px solid var(--border-subtle)',
-                        }}
-                      >
-                        <button
-                          onClick={() => updateQuantity(item.product._id, item.quantity - 1)}
-                          style={{
-                            padding: '0.2rem 0.55rem',
-                            background: 'none',
-                            color: '#fff',
-                            fontSize: '0.85rem',
-                          }}
-                        >
-                          -
-                        </button>
-                        <span style={{ padding: '0 0.4rem', fontSize: '0.82rem', fontWeight: 700 }}>
-                          {item.quantity}
-                        </span>
-                        <button
-                          onClick={() => updateQuantity(item.product._id, item.quantity + 1)}
-                          style={{
-                            padding: '0.2rem 0.55rem',
-                            background: 'none',
-                            color: '#fff',
-                            fontSize: '0.85rem',
-                          }}
-                        >
-                          +
-                        </button>
-                      </div>
-
-                      <div style={{ fontWeight: 800, fontSize: '0.95rem', color: 'var(--text-primary)' }}>
-                        {formatPrice(discounted * item.quantity, currency)}
-                      </div>
-                    </div>
+                    <span className="text-sm font-black text-gray-900">
+                      ${((item.price || 0) * (item.quantity || 1)).toFixed(2)}
+                    </span>
                   </div>
                 </div>
-              );
-            })
+              </div>
+            ))
           )}
         </div>
 
-        {/* Promo Code & Footer Checkout Summary */}
-        {cartItems.length > 0 && (
-          <div
-            style={{
-              padding: '1.25rem 1.5rem',
-              borderTop: '1px solid var(--border-subtle)',
-              backgroundColor: 'rgba(10, 13, 23, 0.95)',
-            }}
-          >
-            {/* Promo Code Box */}
-            <form onSubmit={handleApply} style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
-              <div style={{ position: 'relative', flex: 1 }}>
-                <Tag size={15} color="var(--text-muted)" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }} />
-                <input
-                  type="text"
-                  placeholder="Promo Code (TECH20)"
-                  className="tech-input"
-                  value={inputCode}
-                  onChange={(e) => setInputCode(e.target.value)}
-                  style={{ width: '100%', paddingLeft: '32px', height: '36px', fontSize: '0.82rem' }}
-                />
-              </div>
-              <button
-                type="submit"
-                className="btn-secondary"
-                style={{ height: '36px', padding: '0 0.85rem', fontSize: '0.82rem' }}
-              >
-                Apply
-              </button>
-            </form>
-
-            {/* Calculations Breakdown */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem', fontSize: '0.85rem', marginBottom: '1rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)' }}>
-                <span>Subtotal</span>
-                <span>{formatPrice(subtotal, currency)}</span>
-              </div>
-
-              {discountAmount > 0 && (
-                <div style={{ display: 'flex', justifyContent: 'space-between', color: '#34d399' }}>
-                  <span>Discount ({promoCode})</span>
-                  <span>-{formatPrice(discountAmount, currency)}</span>
-                </div>
-              )}
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)' }}>
-                <span>Estimated Shipping</span>
-                <span>{shippingPrice === 0 ? <strong style={{ color: '#34d399' }}>FREE</strong> : formatPrice(shippingPrice, currency)}</span>
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)' }}>
-                <span>Estimated Tax (8%)</span>
-                <span>{formatPrice(taxPrice, currency)}</span>
-              </div>
-
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  paddingTop: '0.6rem',
-                  borderTop: '1px solid var(--border-subtle)',
-                  fontSize: '1.15rem',
-                  fontWeight: 800,
-                  color: 'var(--text-primary)',
-                  fontFamily: 'var(--font-heading)',
-                }}
-              >
-                <span>Total</span>
-                <span className="gradient-text">{formatPrice(totalPrice, currency)}</span>
-              </div>
+        {/* Footer */}
+        {cart.length > 0 && (
+          <div className="p-5 border-t border-gray-200 bg-gray-50/50 space-y-3">
+            <div className="flex items-center justify-between text-xs text-gray-500">
+              <span>Estimated Subtotal</span>
+              <span className="text-base font-black text-gray-900">
+                ${subtotal.toFixed(2)}
+              </span>
             </div>
 
-            {/* Checkout Button */}
+            <p className="text-[11px] text-gray-400">
+              Taxes and shipping calculated at checkout.
+            </p>
+
             <button
-              onClick={() => {
-                setIsCartOpen(false);
-                onProceedToCheckout();
-              }}
-              className="btn-primary"
-              style={{
-                width: '100%',
-                padding: '0.85rem',
-                fontSize: '1rem',
-                borderRadius: '10px',
-              }}
+              type="button"
+              onClick={handleCheckout}
+              className="w-full bg-black hover:bg-neutral-800 text-white font-bold py-3.5 px-4 rounded-xl text-xs sm:text-sm shadow-sm transition flex items-center justify-center gap-2"
             >
-              <span>Proceed to Checkout</span>
-              <ArrowRight size={18} />
+              <span>View Full Bag & Checkout</span>
+              <ArrowRight size={16} />
             </button>
 
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.5rem',
-                marginTop: '0.75rem',
-                fontSize: '0.75rem',
-                color: 'var(--text-muted)',
-              }}
-            >
-              <ShieldCheck size={14} color="#34d399" />
-              <span>256-bit Encrypted Checkout • Stripe Verified</span>
+            <div className="flex items-center justify-center gap-2 text-[11px] text-gray-500 pt-1">
+              <ShieldCheck size={14} className="text-emerald-600" />
+              <span>Secure Encrypted Checkout</span>
             </div>
           </div>
         )}

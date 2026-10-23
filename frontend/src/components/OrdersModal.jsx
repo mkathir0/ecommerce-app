@@ -186,8 +186,12 @@ export default function OrdersModal({ isOpen, onClose, onOpenAuth }) {
                   {order.orderItems.map((item, idx) => (
                     <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                       <img
-                        src={item.image}
+                        src={item.image || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=100&q=80'}
                         alt={item.title}
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=100&q=80';
+                        }}
                         style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover' }}
                       />
                       <div style={{ flex: 1, fontSize: '0.85rem', fontWeight: 500 }}>
